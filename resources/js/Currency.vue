@@ -1,10 +1,9 @@
 <template>
     <text-input
-        :value="value"
-        @input="update"
+        v-model="value"
         :id="id"
-        :append="append ? this.symbol : false"
-        :prepend="!append ? this.symbol : false"
+        :append="append ? symbol : false"
+        :prepend="!append ? symbol : false"
         type="text"
     />
 </template>

@@ -25,7 +25,7 @@
     },
     "require": {
         "php": "^8.1",
-        "statamic/cms": "^v4.0|^v5.0",
+        "statamic/cms": "^v4.0|^v5.0|^v6.0",
       "ext-intl": "*"
     },
     "require-dev": {
