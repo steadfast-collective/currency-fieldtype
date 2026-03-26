@@ -1,5 +1,5 @@
 {
-    "name": "steadfast-collective/currency-fieldtype",
+    "name": "doefom/currency-fieldtype",
     "description": "This Statamic addon provides a Currency fieldtype that lets you choose one of the most used currencies in the world and is especially suitable for fields like \"price\" or \"account_balance\" in any of your blueprints.",
     "autoload": {
         "psr-4": {
