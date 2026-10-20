@@ -21,6 +21,11 @@ class ServiceProvider extends AddonServiceProvider
         'publicDirectory' => 'resources/dist',
     ];
 
+    /**
+     * @var array<string, NumberFormatter>
+     */
+    protected static array $formatters = [];
+
     public function register()
     {
         $this->app->bind(NumberFormatter::class, function (Application $app, array $params = []): NumberFormatter {
@@ -31,11 +36,24 @@ class ServiceProvider extends AddonServiceProvider
             $style = Arr::get($params, 'style', NumberFormatter::CURRENCY);
             $iso = Arr::get($params, 'iso');
 
-            $fmt = new NumberFormatter(Site::current()->locale(), $style);
-            $fmt->setTextAttribute(NumberFormatter::CURRENCY_CODE, $iso);
-
-            return $fmt;
+            return $this->makeFormatter(Site::current()->locale(), $style, $iso);
         });
+    }
+
+    /**
+     * Returns a formatter configured for the given locale, style and currency.
+     */
+    protected function makeFormatter(string $locale, int $style, ?string $iso): NumberFormatter
+    {
+        $key = "{$locale}|{$style}|{$iso}";
+
+        if (!isset(static::$formatters[$key])) {
+            $fmt = new NumberFormatter($locale, $style);
+            $fmt->setTextAttribute(NumberFormatter::CURRENCY_CODE, $iso);
+            static::$formatters[$key] = $fmt;
+        }
+
+        return clone static::$formatters[$key];
     }
 
     public function bootAddon()
