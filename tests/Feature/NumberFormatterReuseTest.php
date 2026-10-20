@@ -43,6 +43,26 @@ class NumberFormatterReuseTest extends TestCase
         $this->assertEquals('$1,234.56', $second->formatCurrency(1234.56, 'USD'));
     }
 
+    public function test_augmented_currency_creates_formatter_only_when_needed()
+    {
+        $resolved = 0;
+        $this->app->resolving(NumberFormatter::class, function () use (&$resolved) {
+            $resolved++;
+        });
+
+        $field = new Field('price', ['iso' => 'USD', 'type' => 'currency']);
+        $currency = (new CurrencyFieldtype())->setField($field)->augment(1234.56);
+
+        $this->assertEquals(1234.56, $currency->augmentedValue('value')->value());
+        $this->assertEquals('USD', $currency->augmentedValue('iso')->value());
+        $this->assertEquals(0, $resolved);
+
+        $augmented = $currency->newAugmentedInstance();
+        $this->assertEquals('$1,234.56', $augmented->get('formatted')->value());
+        $this->assertEquals('$', $augmented->get('symbol')->value());
+        $this->assertEquals(1, $resolved);
+    }
+
     protected function formatters(): ReflectionProperty
     {
         return new ReflectionProperty(ServiceProvider::class, 'formatters');
