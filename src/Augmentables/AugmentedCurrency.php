@@ -15,9 +15,9 @@ class AugmentedCurrency extends AbstractAugmented
      * The preconfigured NumberFormatter instance to be used throughout the class
      * which handles all necessary currency string conversion.
      *
-     * @var NumberFormatter|mixed
+     * @var NumberFormatter|null
      */
-    protected NumberFormatter $fmt;
+    protected ?NumberFormatter $fmt = null;
 
     /**
      * Constructs a new AugmentedCurrency instance.
@@ -27,7 +27,11 @@ class AugmentedCurrency extends AbstractAugmented
     public function __construct($data)
     {
         parent::__construct($data);
-        $this->fmt = App::make(NumberFormatter::class, ['iso' => $this->iso()]);
+    }
+
+    protected function fmt(): NumberFormatter
+    {
+        return $this->fmt ??= App::make(NumberFormatter::class, ['iso' => $this->iso()]);
     }
 
     /**
@@ -84,7 +88,7 @@ class AugmentedCurrency extends AbstractAugmented
     public function formatted()
     {
         if( $this->hasNonNullValue() ){
-            return $this->fmt->formatCurrency($this->displayValue(), $this->iso());
+            return $this->fmt()->formatCurrency($this->displayValue(), $this->iso());
         } 
     }
 
@@ -97,7 +101,7 @@ class AugmentedCurrency extends AbstractAugmented
     {
         if( $this->hasNonNullValue() ){
             $formatted = $this->formatted();
-            $symbol = $this->fmt->getSymbol(NumberFormatter::CURRENCY_SYMBOL);
+            $symbol = $this->fmt()->getSymbol(NumberFormatter::CURRENCY_SYMBOL);
 
             return trim(str_replace($symbol, '', $formatted));
         }
@@ -131,7 +135,7 @@ class AugmentedCurrency extends AbstractAugmented
      */
     public function symbol(): string
     {
-        return $this->fmt->getSymbol(NumberFormatter::CURRENCY_SYMBOL);
+        return $this->fmt()->getSymbol(NumberFormatter::CURRENCY_SYMBOL);
     }
 
     /**
@@ -141,7 +145,7 @@ class AugmentedCurrency extends AbstractAugmented
      */
     public function append(): bool
     {
-        return str_ends_with($this->fmt->getPattern(), '¤');
+        return str_ends_with($this->fmt()->getPattern(), '¤');
     }
 
     /**
@@ -151,7 +155,7 @@ class AugmentedCurrency extends AbstractAugmented
      */
     public function groupSeparator(): string
     {
-        return $this->fmt->getSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
+        return $this->fmt()->getSymbol(NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
     }
 
     /**
@@ -161,7 +165,7 @@ class AugmentedCurrency extends AbstractAugmented
      */
     public function radixPoint(): string
     {
-        return $this->fmt->getSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+        return $this->fmt()->getSymbol(NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
     }
 
     /**
@@ -171,7 +175,7 @@ class AugmentedCurrency extends AbstractAugmented
      */
     public function digits(): int
     {
-        return $this->fmt->getAttribute(NumberFormatter::FRACTION_DIGITS);
+        return $this->fmt()->getAttribute(NumberFormatter::FRACTION_DIGITS);
     }
 
     /**
