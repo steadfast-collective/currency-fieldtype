@@ -31,6 +31,18 @@ class NumberFormatterReuseTest extends TestCase
         $this->assertCount(3, $this->formatters()->getValue());
     }
 
+    public function test_returns_a_separate_copy_each_time()
+    {
+        $first = app(NumberFormatter::class, ['iso' => 'USD']);
+        $first->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+
+        $second = app(NumberFormatter::class, ['iso' => 'USD']);
+
+        $this->assertNotSame($first, $second);
+        $this->assertEquals(2, $second->getAttribute(NumberFormatter::FRACTION_DIGITS));
+        $this->assertEquals('$1,234.56', $second->formatCurrency(1234.56, 'USD'));
+    }
+
     protected function formatters(): ReflectionProperty
     {
         return new ReflectionProperty(ServiceProvider::class, 'formatters');
